@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES6",
+    "module": "esnext",
+    "removeComments": true,
+    "lib": ["ESNext", "dom"],
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "baseUrl": "./"
+    // "outDir": "./"
+    // "outFile": "./build/index.js",
+  },
+  "include": ["**/*.ts"],
+  "compileOnSave": true
+}
