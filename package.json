@@ -1,0 +1,13 @@
+{
+  "name": "vue-design-implement",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/k1nz/vue-design-implement.git",
+  "author": "k1nz <kinz.qiu@foxmail.com>",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^4.5.5",
+    "prettier": "^2.7.1"
+  }
+}
