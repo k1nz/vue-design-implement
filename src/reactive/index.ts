@@ -22,16 +22,36 @@
  */
 
 type Effect = Function | undefined
-let activeEffect: Effect = undefined
+interface EffectFn {
+  (): void
+  deps?: Set<Set<Effect>>
+}
+
+let activeEffect: EffectFn = undefined
+
+function cleanup(effectFn: EffectFn) {
+  // 将所有副作用函数从依赖集合中删除
+  effectFn.deps.forEach((deps) => {
+    deps.delete(effectFn)
+  })
+  // 重置 effectFn.deps
+  effectFn.deps = new Set()
+}
 
 export function effect(fn) {
-  activeEffect = fn
-  fn?.()
+  const effectFn: EffectFn = () => {
+    // 清除副作用函数
+    cleanup(effectFn)
+    activeEffect = effectFn
+    fn?.()
+  }
+  // activeEffect.deps 用来存储与该副作用函数相关联的依赖集合，原书中使用数组，这里改用 Set
+  effectFn.deps = new Set()
+  effectFn()
 }
 
 export function reactive<T extends Record<string, unknown>>(target: T): T {
   const proxyMap = new WeakMap<Record<string, unknown>, Map<string, Set<Effect>>>()
-  console.log(proxyMap)
 
   // get拦截函数调用track追踪变化
   function track(target: T, key: string) {
@@ -48,8 +68,10 @@ export function reactive<T extends Record<string, unknown>>(target: T): T {
     // 如果effects不存在，则新建一个Set与key关联
     if (!deps) depsMap.set(key, (deps = new Set()))
 
-    // 将当前激活的副作用函数加入"桶"中
+    // 将当前激活的副作用函数加入 依赖集合 中
     deps.add(activeEffect)
+    // 依赖集合添加至 activeEffect.deps 中
+    activeEffect.deps.add(deps)
   }
 
   // 判断副作用函数是否存在，存在则遍历运行
@@ -60,8 +82,9 @@ export function reactive<T extends Record<string, unknown>>(target: T): T {
     if (!depsMap) return
     // 根据key获取所有副作用函数effects
     const effects = depsMap.get(key)
-    // 判断副作用函数是否存在，存在则遍历运行
-    effects?.forEach((effect) => effect())
+    // 判断副作用函数是否存在，存在则遍历运行。使用 Set 再包一层防止 effects 重复添加删除副作用函数导致无限循环
+    const effectsToRun = new Set(effects)
+    effectsToRun.forEach((effect) => effect())
   }
 
   const proxyHandler: ProxyHandler<T> = {

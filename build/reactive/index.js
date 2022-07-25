@@ -1,11 +1,21 @@
 let activeEffect = undefined;
+function cleanup(effectFn) {
+    effectFn.deps.forEach((deps) => {
+        deps.delete(effectFn);
+    });
+    effectFn.deps = new Set();
+}
 export function effect(fn) {
-    activeEffect = fn;
-    fn?.();
+    const effectFn = () => {
+        cleanup(effectFn);
+        activeEffect = effectFn;
+        fn?.();
+    };
+    effectFn.deps = new Set();
+    effectFn();
 }
 export function reactive(target) {
     const proxyMap = new WeakMap();
-    console.log(proxyMap);
     function track(target, key) {
         if (!activeEffect)
             return;
@@ -16,13 +26,15 @@ export function reactive(target) {
         if (!deps)
             depsMap.set(key, (deps = new Set()));
         deps.add(activeEffect);
+        activeEffect.deps.add(deps);
     }
     function trigger(target, key) {
         const depsMap = proxyMap.get(target);
         if (!depsMap)
             return;
         const effects = depsMap.get(key);
-        effects?.forEach((effect) => effect());
+        const effectsToRun = new Set(effects);
+        effectsToRun.forEach((effect) => effect());
     }
     const proxyHandler = {
         get(target, key) {
