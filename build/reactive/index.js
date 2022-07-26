@@ -49,24 +49,3 @@ export function reactive(target) {
     };
     return new Proxy(target, proxyHandler);
 }
-const data = { text: 'hello world', times: 0 };
-const reactiveObj = reactive(data);
-effect(() => {
-    const text = reactiveObj.text;
-    console.log(text);
-    document.body.innerHTML = text;
-});
-effect(() => {
-    const times = reactiveObj.times;
-    document.body.innerHTML = `${times}`;
-    console.log(times);
-});
-const timer = setInterval(() => {
-    if (reactiveObj.times < 5) {
-        reactiveObj.times++;
-    }
-    else {
-        clearInterval(timer);
-        reactiveObj.text = 'hello reactive!!!!!';
-    }
-}, 1000);

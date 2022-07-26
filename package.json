@@ -5,9 +5,16 @@
   "repository": "https://github.com/k1nz/vue-design-implement.git",
   "author": "k1nz <kinz.qiu@foxmail.com>",
   "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "test": "vitest"
+  },
   "dependencies": {},
   "devDependencies": {
+    "happy-dom": "^6.0.4",
+    "prettier": "^2.7.1",
     "typescript": "^4.5.5",
-    "prettier": "^2.7.1"
+    "vite": "^3.0.3",
+    "vitest": "^0.19.1"
   }
 }
