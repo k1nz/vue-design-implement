@@ -28,6 +28,7 @@ interface EffectFn {
 }
 
 let activeEffect: EffectFn = undefined
+const effectStack: EffectFn[] = []
 
 function cleanup(effectFn: EffectFn) {
   // 将所有副作用函数从依赖集合中删除
@@ -43,7 +44,10 @@ export function effect(fn) {
     // 清除副作用函数
     cleanup(effectFn)
     activeEffect = effectFn
+    effectStack.push(effectFn)
     fn?.()
+    effectStack.pop()
+    activeEffect = effectStack[effectStack.length - 1]
   }
   // activeEffect.deps 用来存储与该副作用函数相关联的依赖集合，原书中使用数组，这里改用 Set
   effectFn.deps = new Set()

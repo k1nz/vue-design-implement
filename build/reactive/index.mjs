@@ -1,4 +1,5 @@
 let activeEffect = undefined;
+const effectStack = [];
 function cleanup(effectFn) {
     effectFn.deps.forEach((deps) => {
         deps.delete(effectFn);
@@ -9,7 +10,10 @@ export function effect(fn) {
     const effectFn = () => {
         cleanup(effectFn);
         activeEffect = effectFn;
+        effectStack.push(effectFn);
         fn?.();
+        effectStack.pop();
+        activeEffect = effectStack[effectStack.length - 1];
     };
     effectFn.deps = new Set();
     effectFn();

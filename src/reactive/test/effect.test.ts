@@ -28,25 +28,34 @@ describe('effect', () => {
       innerCounter: 0,
     })
 
+    let temp1, temp2
+
     const innerSpy = vi.fn(() => {
-      console.log(obj.innerCounter)
+      temp2 = obj.innerCounter
     })
     const outerSpy = vi.fn((fn: Function) => {
       fn()
-      console.log(obj.outerCounter)
+      temp1 = obj.outerCounter
     })
 
-    effect(outerSpy(() => effect(innerSpy)))
+    effect(() => outerSpy(() => effect(innerSpy)))
 
     expect(outerSpy).toHaveBeenCalledTimes(1)
     expect(innerSpy).toHaveBeenCalledTimes(1)
+    expect(temp1).toBe(0)
+    expect(temp2).toBe(0)
 
     obj.outerCounter = 1
+    expect(temp1).toBe(1)
+    expect(temp2).toBe(0)
     expect(outerSpy).toHaveBeenCalledTimes(2)
     expect(innerSpy).toHaveBeenCalledTimes(2)
 
     obj.innerCounter = 1
+    expect(temp1).toBe(1)
+    expect(temp2).toBe(1)
+
     expect(outerSpy).toHaveBeenCalledTimes(2)
-    expect(innerSpy).toHaveBeenCalledTimes(3)
+    expect(innerSpy).toHaveBeenCalledTimes(3) // TODO: received 4 expect to 3
   })
 })
