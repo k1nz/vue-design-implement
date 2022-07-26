@@ -12,7 +12,7 @@
     "baseUrl": "./",
     "outDir": "./build"
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "**/*.mts"],
   "exclude": ["**/*.test.ts", "node_modules", "build", "*.config.ts"],
   "compileOnSave": true
 }

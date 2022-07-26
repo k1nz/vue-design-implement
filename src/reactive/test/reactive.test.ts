@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { reactive } from '../index'
+import { reactive } from '../index.mjs'
 
 describe('reactive', () => {
   test('copy', () => {
